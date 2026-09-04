@@ -14,6 +14,8 @@ class RecurringEvent(Base):
     weekdays: Mapped[list[int]] = mapped_column(JSON, default=list, nullable=False)
     end_date: Mapped[date | None] = mapped_column(Date)
     count: Mapped[int | None] = mapped_column(Integer)
+    active_days: Mapped[int | None] = mapped_column(Integer)
+    rest_days: Mapped[int | None] = mapped_column(Integer)
     user = relationship("User")
 
     @property

@@ -9,6 +9,8 @@ class RecurringEventWrite(BaseModel):
     weekdays: list[int] = Field(default_factory=list)
     end_date: date | None = None
     count: int | None = Field(default=None, ge=1, le=9999)
+    active_days: int | None = Field(default=None, ge=1, le=999)
+    rest_days: int | None = Field(default=None, ge=1, le=999)
 
 class RecurringEventRead(RecurringEventWrite):
     id: int
