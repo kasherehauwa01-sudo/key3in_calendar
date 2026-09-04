@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-key3in}
+      POSTGRES_USER: ${POSTGRES_USER:-key3in}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Укажите POSTGRES_PASSWORD в .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-key3in} -d ${POSTGRES_DB:-key3in}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [key3in]
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-key3in}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-key3in}
+      BASE_PATH: ${BASE_PATH:-/key3in}
+      CORS_ORIGINS: ${CORS_ORIGINS:-'["https://kvasmix.ru"]'}
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [key3in]
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports: ["127.0.0.1:${KEY3IN_PORT:-8083}:80"]
+    depends_on: [backend]
+    networks: [key3in]
+volumes:
+  postgres_data:
+networks:
+  key3in:
