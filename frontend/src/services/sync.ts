@@ -1,0 +1,2 @@
+import { api } from './api';import { completeChange,getPendingChanges } from './offlineStore'
+export async function syncPendingChanges(userId:number){const changes=await getPendingChanges(userId);let completed=0;for(const change of changes){const note=change.text===null?await api.remove(change.date):await api.upsert(change.date,change.text);if(await completeChange(change,note))completed++}return completed}

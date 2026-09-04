@@ -1,2 +1,3 @@
 from .note import Base, Note
-__all__ = ["Base", "Note"]
+from .user import Session, User
+__all__ = ["Base", "Note", "Session", "User"]
