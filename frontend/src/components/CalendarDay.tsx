@@ -25,7 +25,10 @@ export function CalendarDay({
       aria-label={`${cell.day}${notes.length ? `, заметок: ${notes.length}` : ''}`}
       onClick={onClick}
       sx={{
-        display: 'block',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         textAlign: 'left',
         minWidth: 0,
         minHeight: 0,
@@ -59,7 +62,7 @@ export function CalendarDay({
       {loading && cell.currentMonth ? (
         <Skeleton width="85%" height={12} />
       ) : (
-        <Box sx={{ overflow: 'hidden' }}>
+        <Box sx={{ width: '100%', overflow: 'hidden' }}>
           {notes.map((note) => (
             <Typography
               key={note.id}
