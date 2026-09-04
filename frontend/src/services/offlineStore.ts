@@ -20,28 +20,3 @@ export async function updateCachedUser(userId:number,userName:string,userColor:s
  const cached=await all<Note>(NOTES_STORE),db=await openDatabase()
  await new Promise<void>((resolve,reject)=>{const tx=db.transaction(NOTES_STORE,'readwrite'),store=tx.objectStore(NOTES_STORE);cached.filter(note=>note.cache_key?.startsWith(`${userId}:`)&&note.user_id===userId).forEach(note=>store.put({...note,user_name:userName,user_color:userColor}));tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>reject(tx.error)})
 }
-
-export async function cacheNotes(notes: Note[]) {
-  if (!notes.length) return
-
-  const db = await openDatabase()
-
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(NOTES_STORE, 'readwrite')
-    const store = tx.objectStore(NOTES_STORE)
-
-    notes.forEach(note => {
-      store.put({
-        ...note,
-        cache_key: keyOf(note.user_id, `${note.date}:${note.user_id}`)
-      })
-    })
-
-    tx.oncomplete = () => {
-      db.close()
-      resolve()
-    }
-
-    tx.onerror = () => reject(tx.error)
-  })
-}
