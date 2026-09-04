@@ -35,7 +35,7 @@ export function CalendarDay({
         minHeight: 0,
         height: '100%',
         p: { xs: 0.45, sm: 1 },
-        borderRadius: { xs: 2, sm: 3 },
+        borderRadius: { xs: 1.5, sm: 2 },
         bgcolor: cell.currentMonth
           ? 'background.paper'
           : 'rgba(225,228,237,.45)',
