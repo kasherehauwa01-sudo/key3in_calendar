@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -25,7 +25,7 @@ async def update_event(event_id:int,payload:RecurringEventWrite,session:AsyncSes
     await session.commit();await session.refresh(event);return event
 
 @router.delete("/{event_id}",status_code=204)
-async def delete_event(event_id:int,response:Response,session:AsyncSession=Depends(get_session),user:User=Depends(current_user)):
+async def delete_event(event_id:int,session:AsyncSession=Depends(get_session),user:User=Depends(current_user)):
     event=await session.scalar(select(RecurringEvent).where(RecurringEvent.id==event_id,RecurringEvent.user_id==user.id))
     if event: await session.delete(event);await session.commit()
-    return response
+    return None

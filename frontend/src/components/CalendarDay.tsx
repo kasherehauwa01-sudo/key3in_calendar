@@ -19,6 +19,7 @@ export function CalendarDay({
   today,
   onClick,
 }: CalendarDayProps) {
+  const weekend = [0, 6].includes(new Date(`${cell.date}T12:00:00`).getDay())
   return (
     <ButtonBase
       id={`day-${cell.date}`}
@@ -52,8 +53,11 @@ export function CalendarDay({
         sx={{
           fontWeight: today ? 900 : 700,
           fontSize: { xs: '.78rem', sm: '.95rem' },
-          textDecoration: today ? 'underline' : 'none',
-          textUnderlineOffset: 3,
+          color: today ? 'common.white' : weekend ? 'error.main' : 'inherit',
+          bgcolor: today ? 'common.black' : 'transparent',
+          borderRadius: 1,
+          px: .55,
+          py: .1,
         }}
       >
         {cell.day}

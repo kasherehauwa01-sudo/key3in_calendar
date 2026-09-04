@@ -9,7 +9,6 @@ export const api={
  register:(login:string,pin:string,name:string)=>request<AuthResponse>('/auth/register',{method:'POST',body:JSON.stringify({login,pin,name})}),
  login:(login:string,pin:string)=>request<AuthResponse>('/auth/login',{method:'POST',body:JSON.stringify({login,pin})}),
  me:()=>request<User>('/users/me'), updateMe:(name:string,color:string)=>request<User>('/users/me',{method:'PUT',body:JSON.stringify({name,color})}),
- updateApplication:()=>request<{status:string}>('/system/update',{method:'POST'}),
  recurringEvents:()=>request<RecurringEvent[]>('/recurring-events'),createRecurringEvent:(value:RecurringEventInput)=>request<RecurringEvent>('/recurring-events',{method:'POST',body:JSON.stringify(value)}),updateRecurringEvent:(id:number,value:RecurringEventInput)=>request<RecurringEvent>(`/recurring-events/${id}`,{method:'PUT',body:JSON.stringify(value)}),deleteRecurringEvent:(id:number)=>request<void>(`/recurring-events/${id}`,{method:'DELETE'}),
  month:(year:number,month:number)=>request<Note[]>(`/notes?year=${year}&month=${month}`),date:(date:string)=>request<Note[]>(`/notes/${date}`),search:(q:string)=>request<Note[]>(`/notes/search?q=${encodeURIComponent(q)}`),
  upsert:(date:string,text:string)=>request<Note>(`/notes/${date}`,{method:'PUT',body:JSON.stringify({text})}),remove:(date:string)=>request<undefined>(`/notes/${date}`,{method:'DELETE'}),
