@@ -37,7 +37,7 @@ export function NoteEditor({
   saving,
 }: NoteEditorProps) {
   const [text, setText] = useState(initial)
-  const otherNotes = notes.filter((note) => note.user_id !== userId)
+  const otherNotes = notes.filter((note) => note.user_id !== userId || note.recurring)
 
   useEffect(() => setText(initial), [initial, date])
 
