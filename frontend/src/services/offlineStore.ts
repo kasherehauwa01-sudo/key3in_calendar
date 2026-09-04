@@ -11,3 +11,12 @@ export async function saveOfflineNote(userId:number,userName:string,userColor:st
 export async function completeChange(change:PendingChange,serverNote?:Note){const db=await openDatabase();return new Promise<boolean>((resolve,reject)=>{const tx=db.transaction([NOTES_STORE,QUEUE_STORE],'readwrite'),notes=tx.objectStore(NOTES_STORE),queue=tx.objectStore(QUEUE_STORE);let done=false,request=queue.get(change.key);request.onsuccess=()=>{const current=request.result as PendingChange|undefined;if(current?.queuedAt!==change.queuedAt)return;const noteKey=keyOf(change.userId,`${change.date}:${change.userId}`);if(serverNote)notes.put({...serverNote,cache_key:noteKey});else notes.delete(noteKey);queue.delete(change.key);done=true};tx.oncomplete=()=>{db.close();resolve(done)};tx.onerror=()=>reject(tx.error)})}
 export async function searchCachedNotes(userId:number,query:string){const normalized=query.toLocaleLowerCase('ru-RU');return (await all<Note>(NOTES_STORE)).filter(n=>n.cache_key?.startsWith(`${userId}:`)&&n.text.toLocaleLowerCase('ru-RU').includes(normalized)).sort((a,b)=>a.date.localeCompare(b.date))}
 export async function getCachedDate(userId:number,date:string){return (await all<Note>(NOTES_STORE)).filter(n=>n.cache_key?.startsWith(`${userId}:`)&&n.date===date)}
+
+/**
+ * Обновляет подпись собственных заметок во всех локальных копиях пользователя.
+ * Так новое имя и цвет сохраняются и для следующего офлайн-запуска.
+ */
+export async function updateCachedUser(userId:number,userName:string,userColor:string){
+ const cached=await all<Note>(NOTES_STORE),db=await openDatabase()
+ await new Promise<void>((resolve,reject)=>{const tx=db.transaction(NOTES_STORE,'readwrite'),store=tx.objectStore(NOTES_STORE);cached.filter(note=>note.cache_key?.startsWith(`${userId}:`)&&note.user_id===userId).forEach(note=>store.put({...note,user_name:userName,user_color:userColor}));tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>reject(tx.error)})
+}
