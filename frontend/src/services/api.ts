@@ -1,4 +1,4 @@
-import type { AuthResponse, Note, User } from '../types/note'
+import type { AuthResponse, Note, NoteNotification, User } from '../types/note'
 const BASE = `${import.meta.env.BASE_URL}api`
 const TOKEN_KEY = 'key3in-token'
 export class ApiError extends Error { constructor(message:string,public status:number){super(message)} }
@@ -10,4 +10,5 @@ export const api={
  login:(login:string,pin:string)=>request<AuthResponse>('/auth/login',{method:'POST',body:JSON.stringify({login,pin})}),
  me:()=>request<User>('/users/me'), updateMe:(name:string,color:string)=>request<User>('/users/me',{method:'PUT',body:JSON.stringify({name,color})}),
  month:(year:number,month:number)=>request<Note[]>(`/notes?year=${year}&month=${month}`),date:(date:string)=>request<Note[]>(`/notes/${date}`),search:(q:string)=>request<Note[]>(`/notes/search?q=${encodeURIComponent(q)}`),
- upsert:(date:string,text:string)=>request<Note>(`/notes/${date}`,{method:'PUT',body:JSON.stringify({text})}),remove:(date:string)=>request<undefined>(`/notes/${date}`,{method:'DELETE'})}
+ upsert:(date:string,text:string)=>request<Note>(`/notes/${date}`,{method:'PUT',body:JSON.stringify({text})}),remove:(date:string)=>request<undefined>(`/notes/${date}`,{method:'DELETE'}),
+ notifications:()=>request<NoteNotification[]>('/notifications'),readNotification:(noteId:number)=>request<undefined>(`/notifications/${noteId}/read`,{method:'PUT'}),readAllNotifications:()=>request<undefined>('/notifications/read-all',{method:'PUT'})}
