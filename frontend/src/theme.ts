@@ -1,0 +1,2 @@
+import { createTheme } from '@mui/material/styles'
+export const theme=createTheme({palette:{mode:'light',primary:{main:'#425f91'},background:{default:'#f9f9ff',paper:'#f1f3fa'},text:{primary:'#1a1c20',secondary:'#44474f'}},shape:{borderRadius:18},typography:{fontFamily:'Inter, system-ui, -apple-system, sans-serif'},components:{MuiButtonBase:{defaultProps:{disableRipple:false}},MuiButton:{styleOverrides:{root:{minHeight:48,textTransform:'none',fontWeight:700}}},MuiIconButton:{styleOverrides:{root:{minWidth:48,minHeight:48}}}}})
