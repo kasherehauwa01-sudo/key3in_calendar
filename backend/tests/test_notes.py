@@ -22,3 +22,15 @@ async def test_validation_and_auth(client):
     assert (await client.get('/api/notes',params={'year':2026,'month':9})).status_code==401
     assert (await client.post('/api/auth/register',json={'login':'a','pin':'12','name':''})).status_code==422
     headers=await auth(client);assert (await client.put('/api/notes/2026-09-04',headers=headers,json={'text':'x'*20001})).status_code==422
+
+async def test_notifications_are_personal_and_can_be_read(client):
+    anna = await auth(client)
+    boris = await auth(client, 'boris', 'Борис')
+    note = await client.put('/api/notes/2026-09-04', headers=boris, json={'text':'Новая заметка'})
+    notification = (await client.get('/api/notifications', headers=anna)).json()[0]
+    assert notification['note_id'] == note.json()['id']
+    assert notification['user_name'] == 'Борис'
+    assert notification['is_read'] is False
+    assert (await client.get('/api/notifications', headers=boris)).json() == []
+    assert (await client.put(f"/api/notifications/{notification['note_id']}/read", headers=anna)).status_code == 204
+    assert (await client.get('/api/notifications', headers=anna)).json()[0]['is_read'] is True
