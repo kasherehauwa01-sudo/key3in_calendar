@@ -1,4 +1,5 @@
 import { Box, ButtonBase, Skeleton, Typography } from '@mui/material'
+import AutorenewRounded from '@mui/icons-material/AutorenewRounded'
 import type { CalendarCell } from '../utils/date'
 import type { Note } from '../types/note'
 
@@ -87,7 +88,7 @@ export function CalendarDay({
                   fontWeight: 800,
                 }}
               >
-                {note.user_name}:{' '}
+                {note.recurring ? <AutorenewRounded sx={{fontSize:'inherit',verticalAlign:'middle'}} aria-label="Повторяющееся событие"/> : `${note.user_name}:`}{' '}
               </Box>
               {note.text}
             </Typography>
