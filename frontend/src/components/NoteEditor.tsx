@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material'
 import ArrowBackRounded from '@mui/icons-material/ArrowBackRounded'
+import AutorenewRounded from '@mui/icons-material/AutorenewRounded'
 import type { Note } from '../types/note'
 import { fullDate } from '../utils/date'
 
@@ -37,7 +38,7 @@ export function NoteEditor({
   saving,
 }: NoteEditorProps) {
   const [text, setText] = useState(initial)
-  const otherNotes = notes.filter((note) => note.user_id !== userId)
+  const otherNotes = notes.filter((note) => note.user_id !== userId || note.recurring)
 
   useEffect(() => setText(initial), [initial, date])
 
@@ -109,7 +110,7 @@ export function NoteEditor({
                 <Paper key={note.id} variant="outlined" sx={{ p: 1.5 }}>
                   <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                     <Box component="span" sx={{ color: note.user_color, fontWeight: 800 }}>
-                      {note.user_name}:{' '}
+                      {note.recurring ? <AutorenewRounded fontSize="small" aria-label="Повторяющееся событие" /> : `${note.user_name}:`}{' '}
                     </Box>
                     {note.text}
                   </Typography>
