@@ -55,6 +55,7 @@ export function CalendarDay({
           fontWeight: today ? 900 : 700,
           fontSize: { xs: '.78rem', sm: '.95rem' },
           color: today ? 'common.white' : weekend ? 'error.main' : 'inherit',
+          opacity: cell.currentMonth ? 1 : .45,
           bgcolor: today ? 'common.black' : 'transparent',
           borderRadius: 1,
           px: .55,
@@ -88,7 +89,7 @@ export function CalendarDay({
                   fontWeight: 800,
                 }}
               >
-                {note.recurring ? <AutorenewRounded sx={{fontSize:'inherit',verticalAlign:'middle'}} aria-label="Повторяющееся событие"/> : `${note.user_name}:`}{' '}
+                {note.recurring ? '•' : `${note.user_name}:`}{' '}
               </Box>
               {note.text}
             </Typography>
