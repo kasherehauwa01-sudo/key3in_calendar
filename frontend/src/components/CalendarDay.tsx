@@ -46,13 +46,11 @@ export function CalendarDay({
         height: '100%',
         touchAction: 'none',
         p: { xs: 0.45, sm: 1 },
-        borderRadius: { xs: 1.5, sm: 2 },
-        bgcolor: cell.currentMonth
-          ? 'background.paper'
-          : 'rgba(225,228,237,.45)',
+        borderRadius: 0,
+        bgcolor: 'common.white',
         color: cell.currentMonth ? 'text.primary' : 'text.disabled',
-        border: '2px solid',
-        borderColor: highlight ? 'primary.main' : 'transparent',
+        border: '1px solid',
+        borderColor: highlight ? 'primary.main' : 'divider',
         '&:focus-visible': {
           outline: '3px solid #425f91',
           outlineOffset: 1,
