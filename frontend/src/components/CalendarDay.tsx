@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { Box, ButtonBase, Skeleton, Typography } from '@mui/material'
+import AutorenewRounded from '@mui/icons-material/AutorenewRounded'
 import type { CalendarCell } from '../utils/date'
 import type { Note } from '../types/note'
 
