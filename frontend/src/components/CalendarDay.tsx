@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Box, ButtonBase, Skeleton, Typography } from '@mui/material'
 import AutorenewRounded from '@mui/icons-material/AutorenewRounded'
 import type { CalendarCell } from '../utils/date'
@@ -10,6 +11,7 @@ type CalendarDayProps = {
   highlight: boolean
   today: boolean
   onClick: () => void
+  onPreview: (notes: Note[] | null) => void
 }
 
 export function CalendarDay({
@@ -19,13 +21,21 @@ export function CalendarDay({
   highlight,
   today,
   onClick,
+  onPreview,
 }: CalendarDayProps) {
+  const timer=useRef<number|undefined>(undefined),previewing=useRef(false),skipClick=useRef(false)
+  const stopPreview=()=>{clearTimeout(timer.current);if(previewing.current){previewing.current=false;onPreview(null)}}
   const weekend = [0, 6].includes(new Date(`${cell.date}T12:00:00`).getDay())
   return (
     <ButtonBase
       id={`day-${cell.date}`}
       aria-label={`${cell.day}${notes.length ? `, заметок: ${notes.length}` : ''}`}
-      onClick={onClick}
+      onPointerDown={event=>{event.currentTarget.setPointerCapture(event.pointerId);previewing.current=false;skipClick.current=false;timer.current=window.setTimeout(()=>{previewing.current=true;skipClick.current=true;onPreview(notes)},2000)}}
+      onPointerUp={stopPreview}
+      onPointerCancel={stopPreview}
+      onPointerLeave={stopPreview}
+      onContextMenu={event=>event.preventDefault()}
+      onClick={()=>{if(skipClick.current){skipClick.current=false;return}onClick()}}
       sx={{
         display: 'flex',
         flexDirection: 'column',
