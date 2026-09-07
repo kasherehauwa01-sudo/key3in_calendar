@@ -30,10 +30,9 @@ export function CalendarDay({
     <ButtonBase
       id={`day-${cell.date}`}
       aria-label={`${cell.day}${notes.length ? `, заметок: ${notes.length}` : ''}`}
-      onPointerDown={event=>{event.currentTarget.setPointerCapture(event.pointerId);previewing.current=false;skipClick.current=false;timer.current=window.setTimeout(()=>{previewing.current=true;skipClick.current=true;onPreview(notes)},2000)}}
+      onPointerDown={event=>{event.currentTarget.setPointerCapture(event.pointerId);previewing.current=false;skipClick.current=false;timer.current=window.setTimeout(()=>{previewing.current=true;skipClick.current=true;onPreview(notes)},1000)}}
       onPointerUp={stopPreview}
       onPointerCancel={stopPreview}
-      onPointerLeave={stopPreview}
       onContextMenu={event=>event.preventDefault()}
       onClick={()=>{if(skipClick.current){skipClick.current=false;return}onClick()}}
       sx={{
@@ -45,6 +44,7 @@ export function CalendarDay({
         minWidth: 0,
         minHeight: 0,
         height: '100%',
+        touchAction: 'none',
         p: { xs: 0.45, sm: 1 },
         borderRadius: { xs: 1.5, sm: 2 },
         bgcolor: cell.currentMonth
