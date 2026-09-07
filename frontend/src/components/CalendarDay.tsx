@@ -63,14 +63,13 @@ export function CalendarDay({
           fontWeight: today ? 900 : 700,
           fontSize: { xs: '.78rem', sm: '.95rem' },
           color: today ? 'common.white' : weekend ? 'error.main' : 'inherit',
-          opacity: cell.currentMonth ? 1 : .45,
           bgcolor: today ? 'common.black' : 'transparent',
           borderRadius: 1,
           px: .55,
           py: .1,
         }}
       >
-        {cell.day}
+        <Box component="span" sx={{opacity:.1}}>{cell.day}</Box>
       </Typography>
 
       {loading && cell.currentMonth ? (
