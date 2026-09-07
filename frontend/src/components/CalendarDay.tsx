@@ -69,7 +69,7 @@ export function CalendarDay({
           py: .1,
         }}
       >
-        <Box component="span" sx={{opacity:.1}}>{cell.day}</Box>
+        <Box component="span" sx={{opacity:today?1:.5}}>{cell.day}</Box>
       </Typography>
 
       {loading && cell.currentMonth ? (
