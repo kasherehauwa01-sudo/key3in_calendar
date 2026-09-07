@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Box, ButtonBase, Skeleton, Typography } from '@mui/material'
 import type { CalendarCell } from '../utils/date'
 import type { Note } from '../types/note'
@@ -9,6 +10,7 @@ type CalendarDayProps = {
   highlight: boolean
   today: boolean
   onClick: () => void
+  onPreview: (notes: Note[] | null) => void
 }
 
 export function CalendarDay({
@@ -18,20 +20,32 @@ export function CalendarDay({
   highlight,
   today,
   onClick,
+  onPreview,
 }: CalendarDayProps) {
+  const timer=useRef<number|undefined>(undefined),previewing=useRef(false),skipClick=useRef(false)
+  const stopPreview=()=>{clearTimeout(timer.current);if(previewing.current){previewing.current=false;onPreview(null)}}
+  const weekend = [0, 6].includes(new Date(`${cell.date}T12:00:00`).getDay())
   return (
     <ButtonBase
       id={`day-${cell.date}`}
       aria-label={`${cell.day}${notes.length ? `, заметок: ${notes.length}` : ''}`}
-      onClick={onClick}
+      onPointerDown={event=>{event.currentTarget.setPointerCapture(event.pointerId);previewing.current=false;skipClick.current=false;timer.current=window.setTimeout(()=>{previewing.current=true;skipClick.current=true;onPreview(notes)},2000)}}
+      onPointerUp={stopPreview}
+      onPointerCancel={stopPreview}
+      onPointerLeave={stopPreview}
+      onContextMenu={event=>event.preventDefault()}
+      onClick={()=>{if(skipClick.current){skipClick.current=false;return}onClick()}}
       sx={{
-        display: 'block',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         textAlign: 'left',
         minWidth: 0,
         minHeight: 0,
         height: '100%',
         p: { xs: 0.45, sm: 1 },
-        borderRadius: { xs: 2, sm: 3 },
+        borderRadius: { xs: 1.5, sm: 2 },
         bgcolor: cell.currentMonth
           ? 'background.paper'
           : 'rgba(225,228,237,.45)',
@@ -49,8 +63,12 @@ export function CalendarDay({
         sx={{
           fontWeight: today ? 900 : 700,
           fontSize: { xs: '.78rem', sm: '.95rem' },
-          textDecoration: today ? 'underline' : 'none',
-          textUnderlineOffset: 3,
+          color: today ? 'common.white' : weekend ? 'error.main' : 'inherit',
+          opacity: cell.currentMonth ? 1 : .45,
+          bgcolor: today ? 'common.black' : 'transparent',
+          borderRadius: 1,
+          px: .55,
+          py: .1,
         }}
       >
         {cell.day}
@@ -59,7 +77,7 @@ export function CalendarDay({
       {loading && cell.currentMonth ? (
         <Skeleton width="85%" height={12} />
       ) : (
-        <Box sx={{ overflow: 'hidden' }}>
+        <Box sx={{ width: '100%', overflow: 'hidden' }}>
           {notes.map((note) => (
             <Typography
               key={note.id}
@@ -80,7 +98,7 @@ export function CalendarDay({
                   fontWeight: 800,
                 }}
               >
-                {note.user_name}:{' '}
+                {note.recurring ? '•' : `${note.user_name}:`}{' '}
               </Box>
               {note.text}
             </Typography>
