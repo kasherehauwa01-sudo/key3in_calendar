@@ -60,7 +60,7 @@ export function CalendarDay({
         component="span"
         sx={{
           fontWeight: today ? 900 : 700,
-          fontSize: { xs: '.94rem', sm: '1rem' },
+          fontSize: { xs: '.88rem', sm: '.96rem' },
           color: today ? 'common.white' : weekend ? 'error.main' : 'inherit',
           bgcolor: today ? 'common.black' : 'transparent',
           borderRadius: 1,
@@ -79,7 +79,7 @@ export function CalendarDay({
             <Typography
               key={note.id}
               sx={{
-                fontSize: { xs: '.7rem', sm: '.78rem' },
+                fontSize: { xs: '.64rem', sm: '.74rem' },
                 lineHeight: 1.22,
                 display: '-webkit-box',
                 WebkitLineClamp: 2,

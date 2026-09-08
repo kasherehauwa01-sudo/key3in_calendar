@@ -54,7 +54,7 @@ export function WeekView({
             aria-label={`${WEEKDAYS[index % 7]}, ${day.getDate()}`}
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'minmax(0,4fr) minmax(0,1fr)',
+              gridTemplateColumns: 'minmax(52px,10%) minmax(0,1fr) minmax(72px,22%)',
               alignItems: 'stretch',
               textAlign: 'left',
               p: 0,
@@ -64,8 +64,8 @@ export function WeekView({
               overflow: 'hidden',
             }}
           >
-            <Box sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden'}}>
-              <Box sx={{display:'flex',flexDirection:'column',alignItems:'flex-start',mb:.4}}>
+            <Box aria-label="Дата и день" sx={{p:{xs:.5,sm:1},minWidth:0,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center'}}>
+              <Box sx={{display:'flex',flexDirection:'column',alignItems:'center'}}>
                 <Typography component="time" dateTime={date} fontWeight={900} color={isToday ? 'primary.main' : 'text.primary'}>
                   {day.getDate()}
                 </Typography>
@@ -73,6 +73,8 @@ export function WeekView({
                   {WEEKDAYS[index % 7]}
                 </Typography>
               </Box>
+            </Box>
+            <Box aria-label="Заметки" sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden',alignSelf:'stretch'}}>
               {userNotes.map((note) => (
                 <Typography key={note.id} sx={{fontSize:{xs:'.68rem',sm:'.78rem'},whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>
                   <Box component="span" sx={{color:note.user_color,fontWeight:800}}>{note.user_name}:{' '}</Box>
@@ -80,7 +82,7 @@ export function WeekView({
                 </Typography>
               ))}
             </Box>
-            <Box sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden',textAlign:'right'}}>
+            <Box aria-label="Повторяющиеся события" sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden',textAlign:'right'}}>
               {recurringNotes.map((note) => (
                 <Typography key={note.id} sx={{fontSize:{xs:'.62rem',sm:'.78rem'},whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>
                   {note.text}

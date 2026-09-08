@@ -21,5 +21,7 @@ describe('SettingsView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Очень крупный' }))
 
     expect(onFontScaleChange).toHaveBeenCalledWith(125)
+    expect(screen.getByRole('button', { name: 'Мелкий' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Очень мелкий' })).toBeInTheDocument()
   })
 })
