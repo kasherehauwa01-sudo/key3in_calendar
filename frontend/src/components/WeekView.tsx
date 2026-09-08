@@ -23,6 +23,7 @@ export function WeekView({
     (_, index) =>
       new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + index),
   )
+  const today = isoDate(now)
 
   return (
     <Box
@@ -41,6 +42,7 @@ export function WeekView({
     >
       {days.map((day, index) => {
         const date = isoDate(day)
+        const isToday = date === today
         const dayNotes = notes.get(date) ?? []
         const userNotes = dayNotes.filter((note) => !note.recurring)
         const recurringNotes = dayNotes.filter((note) => note.recurring)
@@ -58,15 +60,18 @@ export function WeekView({
               p: 0,
               borderRadius: 0,
               bgcolor: 'common.white',
+              boxShadow: isToday ? 'inset 4px 0 0 #425f91' : 'none',
               overflow: 'hidden',
             }}
           >
             <Box sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden'}}>
-              <Box sx={{display:'flex',gap:.75,alignItems:'baseline',mb:.4}}>
-                <Typography fontWeight={800} color={index % 7 > 4 ? 'error.main' : 'text.primary'}>
+              <Box sx={{display:'flex',flexDirection:'column',alignItems:'flex-start',mb:.4}}>
+                <Typography component="time" dateTime={date} fontWeight={900} color={isToday ? 'primary.main' : 'text.primary'}>
+                  {day.getDate()}
+                </Typography>
+                <Typography variant="caption" fontWeight={800} color={index % 7 > 4 ? 'error.main' : 'text.secondary'}>
                   {WEEKDAYS[index % 7]}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">{day.getDate()}</Typography>
               </Box>
               {userNotes.map((note) => (
                 <Typography key={note.id} sx={{fontSize:{xs:'.68rem',sm:'.78rem'},whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>
@@ -75,7 +80,7 @@ export function WeekView({
                 </Typography>
               ))}
             </Box>
-            <Box sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden'}}>
+            <Box sx={{p:{xs:.75,sm:1},minWidth:0,overflow:'hidden',textAlign:'right'}}>
               {recurringNotes.map((note) => (
                 <Typography key={note.id} sx={{fontSize:{xs:'.62rem',sm:'.78rem'},whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>
                   {note.text}
