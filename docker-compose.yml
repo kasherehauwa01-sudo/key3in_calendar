@@ -23,12 +23,25 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-'["https://kvasmix.ru"]'}
     depends_on:
       postgres: {condition: service_healthy}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)",
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+      start_period: 5s
     networks: [key3in]
   frontend:
     build: ./frontend
     restart: unless-stopped
     ports: ["127.0.0.1:${KEY3IN_PORT:-8083}:80"]
-    depends_on: [backend]
+    depends_on:
+      backend: {condition: service_healthy}
     networks: [key3in]
 volumes:
   postgres_data:
