@@ -17,6 +17,11 @@ services:
   backend:
     build: ./backend
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-key3in}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-key3in}
       BASE_PATH: ${BASE_PATH:-/key3in}
