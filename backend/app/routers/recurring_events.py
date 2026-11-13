@@ -6,6 +6,7 @@ from app.database import get_session
 from app.models import RecurringEvent, User
 from app.schemas import RecurringEventRead, RecurringEventWrite
 from app.services.auth import current_user
+from app.services.telegram import enqueue_created
 
 router=APIRouter(prefix="/api/recurring-events",tags=["recurring-events"])
 
@@ -15,7 +16,12 @@ async def list_events(session:AsyncSession=Depends(get_session),_:User=Depends(c
 
 @router.post("",response_model=RecurringEventRead,status_code=201)
 async def create_event(payload:RecurringEventWrite,session:AsyncSession=Depends(get_session),user:User=Depends(current_user)):
-    event=RecurringEvent(**payload.model_dump(),user_id=user.id,user=user);session.add(event);await session.commit();await session.refresh(event);return event
+    event = RecurringEvent(**payload.model_dump(), user_id=user.id, user=user)
+    session.add(event)
+    await enqueue_created(session, user, event.start_date, event.text, recurring=True)
+    await session.commit()
+    await session.refresh(event)
+    return event
 
 @router.put("/{event_id}",response_model=RecurringEventRead)
 async def update_event(event_id:int,payload:RecurringEventWrite,session:AsyncSession=Depends(get_session),user:User=Depends(current_user)):

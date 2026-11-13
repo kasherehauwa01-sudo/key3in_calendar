@@ -1,5 +1,5 @@
 from functools import lru_cache
-from pydantic import field_validator
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     base_path: str = "/key3in"
     cors_origins: list[str] = ["https://kvasmix.ru"]
     max_note_length: int = 20_000
+    telegram_bot_token: SecretStr = SecretStr("")
+    telegram_proxy_url: SecretStr = SecretStr("")
+    telegram_calendar_url: str = "https://kvasmix.ru/key3in/"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @field_validator("base_path")

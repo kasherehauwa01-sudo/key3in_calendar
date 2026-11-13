@@ -7,6 +7,7 @@ from app.models import Note, User
 from app.schemas import NoteCreate, NoteRead, NoteUpdate
 from app.services import notes as service
 from app.services.auth import current_user
+from app.services.telegram import enqueue_created
 
 router = APIRouter(prefix="/api/notes", tags=["notes"])
 
@@ -32,6 +33,7 @@ async def create_note(payload: NoteCreate, session: AsyncSession = Depends(get_s
     note = Note(date=payload.date, text=text, user_id=user.id, user=user)
     session.add(note)
     try:
+        await enqueue_created(session, user, note.date, text)
         await session.commit()
     except IntegrityError:
         await session.rollback(); raise HTTPException(409, "Вы уже оставили заметку на эту дату")
@@ -46,7 +48,9 @@ async def update_note(note_date: date, payload: NoteUpdate, response: Response, 
         if note: await session.delete(note); await session.commit()
         response.status_code = 204; return None
     if not note:
-        note = Note(date=note_date, text=text, user_id=user.id, user=user); session.add(note)
+        note = Note(date=note_date, text=text, user_id=user.id, user=user)
+        session.add(note)
+        await enqueue_created(session, user, note_date, text)
     else: note.text = text
     await session.commit(); await session.refresh(note)
     return note
