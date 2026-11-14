@@ -2,11 +2,24 @@ import { useEffect, useState } from 'react'
 import { Box, Button, Typography } from '@mui/material'
 import { api, type TelegramStatus } from '../services/api'
 
+function telegramAppUrl(webUrl: string) {
+  const url = new URL(webUrl)
+  const username = url.pathname.slice(1)
+  const start = url.searchParams.get('start')
+  if (url.origin !== 'https://t.me' || !/^[A-Za-z0-9_]{5,32}$/.test(username)
+    || !start || !/^[A-Za-z0-9_-]{43}$/.test(start)) {
+    throw new Error('Не удалось получить ссылку на бота')
+  }
+  return `tg://resolve?${new URLSearchParams({ domain: username, start })}`
+}
+
 export function TelegramSettings() {
   const [status, setStatus] = useState<TelegramStatus>()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [reload, setReload] = useState(0)
+  const [links, setLinks] = useState<{ web: string; app: string }>()
+  const android = /Android/i.test(navigator.userAgent)
 
   const pending = status?.pending ?? false
   const loaded = status !== undefined
@@ -22,6 +35,7 @@ export function TelegramSettings() {
         const result = await api.telegramStatus()
         if (active) {
           setStatus(result)
+          if (result.connected || !result.pending || !result.available) setLinks(undefined)
           if (!loaded) setError('')
         }
       } catch (cause) {
@@ -43,17 +57,13 @@ export function TelegramSettings() {
   }, [busy, loaded, pending, reload])
 
   const connect = async () => {
-    const tab = window.open('about:blank', '_blank')
-    if (tab) tab.opener = null
     setBusy(true)
     setError('')
     try {
       const { url } = await api.connectTelegram()
-      if (tab && !tab.closed) tab.location.replace(url)
-      else window.location.assign(url)
+      setLinks({ web: url, app: telegramAppUrl(url) })
       setStatus({ available: true, connected: false, pending: true })
     } catch (cause) {
-      tab?.close()
       setError(cause instanceof Error ? cause.message : 'Не удалось подключить Telegram')
     } finally {
       setBusy(false)
@@ -65,6 +75,7 @@ export function TelegramSettings() {
     setError('')
     try {
       await api.disconnectTelegram()
+      setLinks(undefined)
       setStatus(current => current && { ...current, connected: false, pending: false })
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Не удалось отключить Telegram')
@@ -87,7 +98,16 @@ export function TelegramSettings() {
       {status?.connected
         ? <Button variant="outlined" disabled={busy} onClick={disconnect}>Отключить Telegram</Button>
         : status?.available
-          ? <Button variant="outlined" disabled={busy} onClick={connect}>{status.pending ? 'Открыть новую ссылку' : 'Подключить Telegram'}</Button>
+          ? <>
+              {links && status.pending && !busy && <>
+                <Button component="a" variant="contained" href={android ? links.app : links.web}
+                  target={android ? undefined : '_blank'} rel="noopener noreferrer">Открыть Telegram</Button>
+                {android && <Button component="a" href={links.web} target="_blank" rel="noopener noreferrer">Открыть в браузере</Button>}
+              </>}
+              <Button variant="outlined" disabled={busy} onClick={connect}>
+                {busy ? 'Готовим ссылку…' : status.pending ? 'Получить новую ссылку' : 'Подключить Telegram'}
+              </Button>
+            </>
           : !status && error
             ? <Button onClick={() => { setError(''); setReload(value => value + 1) }}>Повторить проверку</Button>
             : null}
