@@ -7,21 +7,26 @@ from fastapi.responses import JSONResponse
 from .config import get_settings
 from .routers import auth_router, notes_router, notifications_router, recurring_events_router
 
+from .routers.telegram import router as telegram_router
 from .services.telegram import run_delivery_worker
+from .services.telegram_link import enabled, run_link_worker
 
 settings = get_settings()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    worker = None
+    workers = []
     if settings.telegram_bot_token.get_secret_value():
-        worker = asyncio.create_task(run_delivery_worker())
+        workers.append(asyncio.create_task(run_delivery_worker()))
+    if enabled(settings):
+        workers.append(asyncio.create_task(run_link_worker()))
     try:
         yield
     finally:
-        if worker is not None:
+        for worker in workers:
             worker.cancel()
+        for worker in workers:
             with suppress(asyncio.CancelledError):
                 await worker
 
@@ -32,6 +37,7 @@ app.include_router(auth_router)
 app.include_router(notes_router)
 app.include_router(notifications_router)
 app.include_router(recurring_events_router)
+app.include_router(telegram_router)
 
 @app.get("/api/health", tags=["system"])
 async def health(): return {"status": "ok"}

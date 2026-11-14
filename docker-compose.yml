@@ -25,6 +25,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-key3in}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-key3in}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-kalendarKey3n_bot}
       TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL:-}
       TELEGRAM_CALENDAR_URL: ${TELEGRAM_CALENDAR_URL:-https://kvasmix.ru/key3in/}
       BASE_PATH: ${BASE_PATH:-/key3in}
