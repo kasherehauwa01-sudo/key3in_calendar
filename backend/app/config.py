@@ -1,3 +1,4 @@
+import re
 from functools import lru_cache
 from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -8,9 +9,18 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["https://kvasmix.ru"]
     max_note_length: int = 20_000
     telegram_bot_token: SecretStr = SecretStr("")
+    telegram_bot_username: str = ""
     telegram_proxy_url: SecretStr = SecretStr("")
     telegram_calendar_url: str = "https://kvasmix.ru/key3in/"
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @field_validator("telegram_bot_username")
+    @classmethod
+    def normalize_telegram_username(cls, value: str) -> str:
+        value = value.strip().removeprefix("@")
+        if value and not re.fullmatch(r"[A-Za-z0-9_]{5,32}", value):
+            raise ValueError("Invalid Telegram bot username")
+        return value
 
     @field_validator("base_path")
     @classmethod
